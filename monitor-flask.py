@@ -6,6 +6,7 @@ import time
 import datetime
 import logging
 import os
+import sys
 
 logging.getLogger("werkzeug").disabled = True
 app = Flask(__name__)
@@ -13,15 +14,22 @@ app = Flask(__name__)
 # Get the path to the API list file from the environment variable
 API_LIST_PATH = os.getenv('API_LIST_PATH')
 
-# Check if the API list file exists
+# Function to read API URLs from a file
+def read_apis_from_file(file_path):
+    with open(file_path, 'r') as file:
+        return [line.strip() for line in file.readlines() if line.strip()]
+
+# Determine the list of APIs to monitor
 if API_LIST_PATH and os.path.isfile(API_LIST_PATH):
-    with open(API_LIST_PATH, 'r') as file:
-        API_URLS = [line.strip() for line in file.readlines() if line.strip()]
+    API_URLS = read_apis_from_file(API_LIST_PATH)
+elif len(sys.argv) > 1:
+    API_URLS = sys.argv[1:]
 else:
     # Default list of APIs to monitor
     API_URLS = [
-        "https://thepdahoi.com",
-        "https://1921992.xyz",
+        "https://google.com",
+        "https://vtc1111.vn",
+        "https://vtc5555.vn"
     ]
 
 
