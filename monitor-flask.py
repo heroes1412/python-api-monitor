@@ -11,6 +11,15 @@ import sys
 logging.getLogger("werkzeug").disabled = True
 app = Flask(__name__)
 
+# Configure logging to output to stdout
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.INFO,
+    format='%(asctime)s - %(message)s',
+    datefmt='%H:%M:%S %d-%m-%Y'
+)
+logger = logging.getLogger(__name__)
+
 # Get the path to the API list file from the environment variable
 API_LIST_PATH = os.getenv('API_LIST_PATH')
 
@@ -22,7 +31,6 @@ def read_apis_from_file(file_path):
 # Determine the list of APIs to monitor
 if API_LIST_PATH and os.path.isfile(API_LIST_PATH):
     API_URLS = read_apis_from_file(API_LIST_PATH)
-elif len(sys.argv) > 1:
     API_URLS = sys.argv[1:]
 else:
     # Default list of APIs to monitor
@@ -85,12 +93,14 @@ def check_api(url):
             else:
                 api_status[url]['check_results'].append(False)
                 api_status[url]['last_down_time'] = datetime.datetime.now()
-                print(f"{datetime.datetime.now().strftime('%H:%M:%S %d-%m-%Y')} - {url} - Status: Down")
+                #print(f"{datetime.datetime.now().strftime('%H:%M:%S %d-%m-%Y')} - {url} - Status: Down")
+                logger.info(f"{url} - Status: Down") #log for k8s log
     except requests.exceptions.RequestException:
         with status_lock:
             api_status[url]['check_results'].append(False)
             api_status[url]['last_down_time'] = datetime.datetime.now()
-            print(f"{datetime.datetime.now().strftime('%H:%M:%S %d-%m-%Y')} - {url} - Error")
+           # print(f"{datetime.datetime.now().strftime('%H:%M:%S %d-%m-%Y')} - {url} - Error")
+            logger.error(f"{url} - Error")
 
 def periodic_check():
     while True:
