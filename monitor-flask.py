@@ -31,6 +31,7 @@ def read_apis_from_file(file_path):
 # Determine the list of APIs to monitor
 if API_LIST_PATH and os.path.isfile(API_LIST_PATH):
     API_URLS = read_apis_from_file(API_LIST_PATH)
+elif len(sys.argv) > 1:
     API_URLS = sys.argv[1:]
 else:
     # Default list of APIs to monitor
